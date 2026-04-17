@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as interactionService from "@/services/interaction.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const CreateInteractionSchema = z.object({
@@ -48,6 +49,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "interactions", "create");
   if (perm) return perm;
 

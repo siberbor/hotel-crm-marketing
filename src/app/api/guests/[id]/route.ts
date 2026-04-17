@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as guestService from "@/services/guest.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const UpdateGuestSchema = z.object({
@@ -41,6 +42,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "guests", "update");
   if (perm) return perm;
 
@@ -88,6 +92,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "guests", "delete");
   if (perm) return perm;
 

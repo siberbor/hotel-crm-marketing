@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as campaignService from "@/services/campaign.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const CreateCampaignSchema = z.object({
@@ -34,6 +35,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "campaigns", "create");
   if (perm) return perm;
 

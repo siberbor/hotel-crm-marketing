@@ -1,38 +1,25 @@
-# Current Sprint: Sprint 0 — Foundation
+# Current Sprint: Sprint 2 — API Completeness & Tests
 
-**Status:** ✅ Completed
+**Status:** ✅ Complete
+**Started:** 2026-04-17
 
-## Completed Tasks
+## Tasks
 
-| ID  | Title                      | Status  |
-| --- | -------------------------- | ------- |
-| T01 | DB schema + project init   | ✅ Done |
-| T02 | Auth module (JWT + roles)  | ✅ Done |
-| T03 | Guest CRUD                 | ✅ Done |
-| T04 | UI Design System           | ✅ Done |
-| T05 | Dashboard                  | ✅ Done |
-| T06 | Модуль бронирований        | ✅ Done |
-| T07 | CRM история взаимодействий | ✅ Done |
-| T08 | Email-маркетинг кампании   | ✅ Done |
-| T09 | Уведомления                | ✅ Done |
-| T10 | Отчёты и аналитика         | ✅ Done |
-| T11 | Глобальный поиск           | ✅ Done |
-| T12 | Сегментация гостей         | ✅ Done |
-| T13 | Channel Manager интеграция | ✅ Done |
-| T14 | Мобильная адаптация (PWA)  | ✅ Done |
-| T15 | RBAC детальный             | ✅ Done |
-| T16 | Онбординг тур              | ✅ Done |
-| T17 | Backup и мониторинг        | ✅ Done |
-| T18 | OpenAPI документация       | ✅ Done |
+| ID  | Title                                     | Status      |
+| --- | ----------------------------------------- | ----------- |
+| T32 | CRUD /api/campaigns/[id]                  | ✅ Done     |
+| T33 | CRUD /api/interactions/[id]               | ✅ Done     |
+| T34 | API integration tests (bookings, campaigns, interactions) | ✅ Done |
+| T35 | Rate limiting on mutation endpoints       | ✅ Done     |
 
-## Sprint 0 Checklist
+## Sprint Goal
 
-- [x] `npm run dev` работает без ошибок
-- [x] Схема БД создана (Drizzle ORM)
-- [x] `/api/auth/login` возвращает JWT
-- [x] Все 4 роли работают (admin, manager, marketing, receptionist)
-- [x] UI компоненты созданы (Button, Input, Card, Badge, Modal, Table)
+Закрыть функциональные пробелы API. Покрыть тестами все ключевые эндпоинты.
+Добавить rate limiting для защиты от злоупотреблений.
 
-## Next
+## Sprint Checklist
 
-Готов к новым задачам!
+- [ ] GET/PATCH/DELETE /api/campaigns/[id] работает
+- [ ] GET/DELETE /api/interactions/[id] работает
+- [ ] Тесты: bookings, campaigns, interactions API
+- [ ] Rate limiting на POST/PATCH/DELETE

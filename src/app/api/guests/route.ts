@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as guestService from "@/services/guest.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
 const CreateGuestSchema = z.object({
@@ -42,6 +43,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "guests", "create");
   if (perm) return perm;
 

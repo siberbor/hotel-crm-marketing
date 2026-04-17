@@ -140,6 +140,15 @@ export const demoStore = {
     return booking;
   },
 
+  getBookingById: (id: number) => BOOKINGS.find((b) => b.id === id) || null,
+
+  deleteBooking: (id: number) => {
+    const idx = BOOKINGS.findIndex((b) => b.id === id);
+    if (idx === -1) return false;
+    BOOKINGS.splice(idx, 1);
+    return true;
+  },
+
   updateBookingStatus: (id: number, status: DemoBooking["status"]) => {
     const booking = BOOKINGS.find((b) => b.id === id);
     if (booking) booking.status = status;

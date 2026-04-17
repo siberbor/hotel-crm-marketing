@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as bookingService from "@/services/booking.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
+import { emitBookingCreated } from "@/ws/index";
+import { getEmailQueue } from "@/lib/queues";
 import { z } from "zod";
 
 const CreateBookingSchema = z.object({
@@ -52,6 +55,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "bookings", "create");
   if (perm) return perm;
 
@@ -91,6 +97,13 @@ export async function POST(request: NextRequest) {
       checkInDate,
       checkOutDate,
     });
+    emitBookingCreated(booking as Record<string, unknown>);
+    if (process.env.REDIS_URL) {
+      getEmailQueue().add("booking_confirmation", {
+        type: "booking_confirmation",
+        bookingId: (booking as { id: number }).id,
+      }).catch(() => { /* non-critical */ });
+    }
     return NextResponse.json({ data: booking }, { status: 201 });
   } catch (error) {
     return NextResponse.json(

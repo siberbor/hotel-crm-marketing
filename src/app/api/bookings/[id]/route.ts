@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as bookingService from "@/services/booking.service";
 import { permissionsMiddleware } from "@/middleware/permissions";
+import { rateLimit } from "@/lib/rate-limit";
+import { emitBookingStatusChanged } from "@/ws/index";
+import { getEmailQueue } from "@/lib/queues";
 import { z } from "zod";
 
 const UpdateBookingSchema = z.object({
@@ -40,6 +43,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "bookings", "update");
   if (perm) return perm;
 
@@ -79,6 +85,15 @@ export async function PATCH(
       );
     }
 
+    if (parsed.data.status) {
+      emitBookingStatusChanged(id, parsed.data.status);
+      if (parsed.data.status === "cancelled" && process.env.REDIS_URL) {
+        getEmailQueue().add("booking_cancellation", {
+          type: "booking_cancellation",
+          bookingId: id,
+        }).catch(() => { /* non-critical */ });
+      }
+    }
     return NextResponse.json({ data: booking });
   } catch (error) {
     return NextResponse.json(
@@ -97,6 +112,9 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
+  const limited = rateLimit(request);
+  if (limited) return limited;
+
   const perm = await permissionsMiddleware(request, "bookings", "delete");
   if (perm) return perm;
 

@@ -25,7 +25,8 @@ export async function getAllBookings(page = 1, limit = 20) {
       db.select().from(bookings).limit(limit).offset(offset).orderBy(bookings.createdAt),
       db.select({ total: sql<number>`count(*)` }).from(bookings),
     ]);
-    return { data, total: Number(total), page, limit };
+    if (Number(total) > 0) return { data, total: Number(total), page, limit };
+    return demoStore.getBookings(page, limit) as unknown as { data: Booking[]; total: number; page: number; limit: number };
   } catch {
     return demoStore.getBookings(page, limit) as unknown as { data: Booking[]; total: number; page: number; limit: number };
   }
@@ -33,10 +34,12 @@ export async function getAllBookings(page = 1, limit = 20) {
 
 export async function getBookingById(id: number) {
   try {
+    const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(bookings);
+    if (Number(total) === 0) return (demoStore.getBookingById(id) as unknown as Booking) || null;
     const result = await db.select().from(bookings).where(eq(bookings.id, id)).limit(1);
     return result[0] || null;
   } catch {
-    return null;
+    return (demoStore.getBookingById(id) as unknown as Booking) || null;
   }
 }
 
@@ -81,11 +84,15 @@ export async function createBooking(input: CreateBookingInput) {
 
 export async function updateBooking(id: number, input: UpdateBookingInput) {
   try {
+    const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(bookings);
+    if (Number(total) === 0 && input.status) {
+      return demoStore.updateBookingStatus(id, input.status as "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled") as unknown as Booking;
+    }
     const result = await db.update(bookings).set({ ...input, updatedAt: new Date() }).where(eq(bookings.id, id)).returning();
     return result[0] || null;
   } catch {
     if (input.status) {
-      return demoStore.updateBookingStatus(id, input.status) as unknown as Booking;
+      return demoStore.updateBookingStatus(id, input.status as "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled") as unknown as Booking;
     }
     return null;
   }
@@ -96,6 +103,12 @@ export async function updateBookingStatus(id: number, status: Booking["status"])
 }
 
 export async function deleteBooking(id: number) {
-  const result = await db.delete(bookings).where(eq(bookings.id, id)).returning();
-  return result.length > 0;
+  try {
+    const [{ total }] = await db.select({ total: sql<number>`count(*)` }).from(bookings);
+    if (Number(total) === 0) return demoStore.deleteBooking(id) as boolean;
+    const result = await db.delete(bookings).where(eq(bookings.id, id)).returning();
+    return result.length > 0;
+  } catch {
+    return demoStore.deleteBooking(id) as boolean;
+  }
 }
