@@ -2,32 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Button,
-  Card,
-  CardTitle,
-  Badge,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui";
+import { AppShell } from "@/components/AppShell";
+import Link from "next/link";
 
 interface Guest {
   id: number;
   firstName: string;
   lastName: string;
   email: string | null;
-  phone: string | null;
   totalVisits: number;
 }
 
 interface Booking {
   id: number;
   guestId: number;
-  roomId: number;
   checkInDate: string;
   checkOutDate: string;
   status: string;
@@ -35,238 +23,161 @@ interface Booking {
   paymentStatus: string;
 }
 
-interface Stats {
-  guestsToday: number;
-  totalBookings: number;
-  occupancy: number;
-  revenue: number;
-}
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Ожидает",
+  confirmed: "Подтверждено",
+  checked_in: "Заселён",
+  checked_out: "Выселен",
+  cancelled: "Отменено",
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+  confirmed: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  checked_in: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  checked_out: "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400",
+  cancelled: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+};
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => {
-        if (!res.ok) throw new Error("Not authenticated");
-        return res.json();
-      })
-      .then((data) => setUser(data.data?.user))
-      .catch(() => router.push("/login"));
-  }, [router]);
 
   useEffect(() => {
     Promise.all([
-      fetch("/api/guests").then((r) => r.json()),
+      fetch("/api/guests?limit=100").then((r) => r.json()),
       fetch("/api/bookings").then((r) => r.json()),
-    ]).then(([guestsData, bookingsData]) => {
-      if (guestsData.data) setGuests(guestsData.data);
-      if (bookingsData.data) setBookings(bookingsData.data);
-      setLoading(false);
+    ]).then(([gd, bd]) => {
+      if (gd.data) setGuests(gd.data);
+      if (bd.data) setBookings(bd.data);
     });
   }, []);
 
-  const handleLogout = async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-  };
-
-  const stats: Stats = {
-    guestsToday: bookings.filter((b) => {
-      const today = new Date().toISOString().split("T")[0];
-      return b.checkInDate.startsWith(today);
-    }).length,
-    totalBookings: bookings.length,
-    occupancy:
-      Math.round(
-        (bookings.filter((b) => b.status === "checked_in").length / 50) * 100,
-      ) || 0,
-    revenue: bookings.reduce(
-      (sum, b) => sum + parseInt(b.totalPrice || "0"),
-      0,
-    ),
-  };
-
-  if (!user) return <div className="p-8">Загрузка...</div>;
+  const today = new Date().toISOString().split("T")[0];
+  const stats = [
+    {
+      label: "Заезд сегодня",
+      value: bookings.filter((b) => b.checkInDate.startsWith(today)).length,
+      icon: "📥",
+      color: "text-blue-600 dark:text-blue-400",
+      bg: "bg-blue-50 dark:bg-blue-900/20",
+    },
+    {
+      label: "Заселены сейчас",
+      value: bookings.filter((b) => b.status === "checked_in").length,
+      icon: "🏨",
+      color: "text-green-600 dark:text-green-400",
+      bg: "bg-green-50 dark:bg-green-900/20",
+    },
+    {
+      label: "Загруженность",
+      value: `${Math.min(100, Math.round((bookings.filter((b) => b.status === "checked_in").length / 10) * 100))}%`,
+      icon: "📊",
+      color: "text-purple-600 dark:text-purple-400",
+      bg: "bg-purple-50 dark:bg-purple-900/20",
+    },
+    {
+      label: "Выручка (всего)",
+      value: `₽${bookings.reduce((s, b) => s + parseInt(b.totalPrice || "0"), 0).toLocaleString("ru")}`,
+      icon: "💰",
+      color: "text-emerald-600 dark:text-emerald-400",
+      bg: "bg-emerald-50 dark:bg-emerald-900/20",
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            Hotel CRM
-          </h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-300">
-              {user.name}
-            </span>
-            <Badge variant="info">{user.role}</Badge>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              Выйти
-            </Button>
+    <AppShell>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Дашборд</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+            {new Date().toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {stats.map((s) => (
+            <div key={s.label} className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
+              <div className={`w-10 h-10 rounded-lg ${s.bg} flex items-center justify-center text-xl mb-3`}>{s.icon}</div>
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tables row */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Recent guests */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Последние гости</h2>
+              <Link href="/guests" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Все →</Link>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-gray-700/60">
+              {guests.slice(0, 5).map((g) => (
+                <div key={g.id} className="flex items-center gap-3 px-5 py-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-400 text-xs font-semibold flex-shrink-0">
+                    {g.firstName[0]}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{g.firstName} {g.lastName}</p>
+                    <p className="text-xs text-gray-400 truncate">{g.email || "—"}</p>
+                  </div>
+                  <span className="text-xs text-gray-400">{g.totalVisits} визитов</span>
+                </div>
+              ))}
+              {guests.length === 0 && <p className="px-5 py-8 text-sm text-gray-400 text-center">Нет гостей</p>}
+            </div>
+          </div>
+
+          {/* Recent bookings */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="font-semibold text-gray-900 dark:text-white text-sm">Активные бронирования</h2>
+              <Link href="/bookings" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">Все →</Link>
+            </div>
+            <div className="divide-y divide-gray-100 dark:divide-gray-700/60">
+              {bookings.filter((b) => b.status !== "cancelled" && b.status !== "checked_out").slice(0, 5).map((b) => (
+                <div key={b.id} className="flex items-center gap-3 px-5 py-3">
+                  <span className="text-xs font-mono text-gray-400 w-8">#{b.id}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900 dark:text-gray-100">
+                      {new Date(b.checkInDate).toLocaleDateString("ru-RU", { day: "2-digit", month: "short" })} → {new Date(b.checkOutDate).toLocaleDateString("ru-RU", { day: "2-digit", month: "short" })}
+                    </p>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${STATUS_COLORS[b.status] || ""}`}>
+                    {STATUS_LABELS[b.status] || b.status}
+                  </span>
+                  <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">₽{parseInt(b.totalPrice).toLocaleString("ru")}</span>
+                </div>
+              ))}
+              {bookings.length === 0 && <p className="px-5 py-8 text-sm text-gray-400 text-center">Нет бронирований</p>}
+            </div>
           </div>
         </div>
-      </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Заезд сегодня
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-              {stats.guestsToday}
-            </p>
-          </Card>
-          <Card>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Всего бронирований
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-              {stats.totalBookings}
-            </p>
-          </Card>
-          <Card>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Загруженность
-            </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-              {stats.occupancy}%
-            </p>
-          </Card>
-          <Card>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Выручка</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">
-              ₽{stats.revenue.toLocaleString()}
-            </p>
-          </Card>
+        {/* Quick links */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {[
+            { href: "/guests", label: "Гости", count: guests.length, icon: "👤" },
+            { href: "/bookings", label: "Бронирования", count: bookings.length, icon: "📅" },
+            { href: "/campaigns", label: "Кампании", count: null, icon: "📧" },
+            { href: "/reports", label: "Отчёты", count: null, icon: "📊" },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-md transition-all group"
+            >
+              <span className="text-2xl block mb-2">{item.icon}</span>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">{item.label}</p>
+              {item.count !== null && <p className="text-xs text-gray-400 mt-0.5">{item.count} записей</p>}
+            </Link>
+          ))}
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card padding="none">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <CardTitle>Последние гости</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push("/guests")}
-              >
-                Все гости →
-              </Button>
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Имя</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Визитов</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {guests.slice(0, 5).map((guest) => (
-                  <TableRow key={guest.id}>
-                    <TableCell>
-                      {guest.firstName} {guest.lastName}
-                    </TableCell>
-                    <TableCell>{guest.email || "-"}</TableCell>
-                    <TableCell>{guest.totalVisits}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-
-          <Card padding="none">
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-              <CardTitle>Активные бронирования</CardTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push("/bookings")}
-              >
-                Все бронирования →
-              </Button>
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Заезд</TableHead>
-                  <TableHead>Статус</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {bookings.slice(0, 5).map((booking) => (
-                  <TableRow key={booking.id}>
-                    <TableCell>#{booking.id}</TableCell>
-                    <TableCell>
-                      {new Date(booking.checkInDate).toLocaleDateString("ru")}
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          booking.status === "confirmed"
-                            ? "info"
-                            : booking.status === "checked_in"
-                              ? "success"
-                              : "default"
-                        }
-                      >
-                        {booking.status}
-                      </Badge>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card
-            className="cursor-pointer hover:border-blue-500 transition-colors"
-            onClick={() => router.push("/guests")}
-          >
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Гости
-            </p>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              {guests.length}
-            </p>
-            <p className="text-xs text-blue-600 mt-2">Управление гостями →</p>
-          </Card>
-          <Card
-            className="cursor-pointer hover:border-blue-500 transition-colors"
-            onClick={() => router.push("/bookings")}
-          >
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Бронирования
-            </p>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              {bookings.length}
-            </p>
-            <p className="text-xs text-blue-600 mt-2">
-              Управление бронированиями →
-            </p>
-          </Card>
-          <Card
-            className="cursor-pointer hover:border-blue-500 transition-colors"
-            onClick={() => router.push("/bookings")}
-          >
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-              Номера
-            </p>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              5
-            </p>
-            <p className="text-xs text-blue-600 mt-2">Свободные номера →</p>
-          </Card>
-        </div>
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

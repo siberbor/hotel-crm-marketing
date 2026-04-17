@@ -4,8 +4,8 @@ import { permissionsMiddleware } from "@/middleware/permissions";
 import { z } from "zod";
 
 const CreateBookingSchema = z.object({
-  guestId: z.number({ required_error: "ID гостя обязателен" }),
-  roomId: z.number({ required_error: "ID номера обязателен" }),
+  guestId: z.coerce.number({ required_error: "ID гостя обязателен" }),
+  roomId: z.coerce.number({ required_error: "ID номера обязателен" }),
   checkInDate: z.string().datetime().or(z.string().date()),
   checkOutDate: z.string().datetime().or(z.string().date()),
   totalPrice: z.string(),

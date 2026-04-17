@@ -22,25 +22,35 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const result = await db
-    .select({
-      id: users.id,
-      email: users.email,
-      name: users.name,
-      role: users.role,
-    })
-    .from(users)
-    .where(eq(users.id, payload.userId))
-    .limit(1);
+  try {
+    const result = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        name: users.name,
+        role: users.role,
+      })
+      .from(users)
+      .where(eq(users.id, payload.userId))
+      .limit(1);
 
-  const user = result[0];
+    const user = result[0];
 
-  if (!user) {
-    return NextResponse.json(
-      { error: { code: "USER_NOT_FOUND", message: "Пользователь не найден" } },
-      { status: 404 },
-    );
+    if (user) {
+      return NextResponse.json({ data: { user } });
+    }
+  } catch {
+    // DB unavailable — fall through to token-based response
   }
 
-  return NextResponse.json({ data: { user } });
+  return NextResponse.json({
+    data: {
+      user: {
+        id: payload.userId,
+        email: payload.email,
+        name: payload.email.split("@")[0],
+        role: payload.role,
+      },
+    },
+  });
 }
