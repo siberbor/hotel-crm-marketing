@@ -126,9 +126,9 @@ export default function ChannelsPage() {
                   variant="secondary"
                   className="w-full"
                   onClick={() => handleSync(channel.id)}
-                  disabled={syncing === channel}
+                  disabled={syncing === channel.id}
                 >
-                  {syncing === channel
+                  {syncing === channel.id
                     ? "Синхронизация..."
                     : "Синхронизировать"}
                 </Button>

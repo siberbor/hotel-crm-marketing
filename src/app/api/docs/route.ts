@@ -1,4 +1,6 @@
-export const OPENAPI_SPEC = {
+import { NextResponse } from "next/server";
+
+const OPENAPI_SPEC = {
   openapi: "3.0.0",
   info: {
     title: "Hotel CRM API",
@@ -69,3 +71,7 @@ export const OPENAPI_SPEC = {
     },
   },
 };
+
+export function GET() {
+  return NextResponse.json(OPENAPI_SPEC);
+}
