@@ -13,12 +13,6 @@ const CreateBookingSchema = z.object({
   notes: z.string().optional(),
 });
 
-const UpdateBookingSchema = z.object({
-  status: z
-    .enum(["pending", "confirmed", "checked_in", "checked_out", "cancelled"])
-    .optional(),
-  paidAmount: z.string().optional(),
-});
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);

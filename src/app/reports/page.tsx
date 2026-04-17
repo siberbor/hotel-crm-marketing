@@ -148,7 +148,7 @@ export default function ReportsPage() {
                 <CardTitle className="mb-4">Источники бронирований</CardTitle>
                 {report.topSources.length > 0 ? (
                   <div className="space-y-3">
-                    {report.topSources.map(([source, count], i) => (
+                    {report.topSources.map(([source, count], _i) => (
                       <div
                         key={source}
                         className="flex items-center justify-between"

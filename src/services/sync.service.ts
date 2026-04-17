@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { db, syncLogs, type SyncLog as DbSyncLog } from "@/db";
 
 export type SyncLog = DbSyncLog;

@@ -8,7 +8,7 @@ export async function GET(request: Request) {
   const channel = searchParams.get("channel");
 
   try {
-    let result = await syncService.getAllSyncLogs(page, limit);
+    const result = await syncService.getAllSyncLogs(page, limit);
 
     if (channel) {
       result.data = result.data.filter((log: any) => log.channel === channel);
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { channel, action, externalId } = body;
+    const { channel } = body;
 
     if (!channel) {
       return NextResponse.json(

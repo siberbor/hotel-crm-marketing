@@ -146,7 +146,7 @@ function handleRequest(req, res) {
         // Also update task file status
         const taskFile = join(KANBAN_TASKS, `${id}.md`);
         if (existsSync(taskFile)) {
-          let content = readFileSync(taskFile, 'utf-8');
+          const content = readFileSync(taskFile, 'utf-8');
           const statusLine = content.match(/^##\s+Status\s*$/mi);
           if (statusLine) {
             const start = statusLine.index + statusLine[0].length;

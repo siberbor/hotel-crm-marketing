@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/auth/jwt";
 
-const MUTATING_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
-
 const PERMISSION_RULES: Record<string, Record<string, string[]>> = {
   guests: {
     read: ["admin", "manager", "marketing", "receptionist"],

@@ -47,7 +47,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
   const [guests, setGuests] = useState<Guest[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/auth/me")

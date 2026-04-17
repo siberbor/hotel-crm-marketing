@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as notificationService from "@/services/notification.service";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const notifications = await notificationService.getNotifications();
     const unreadCount = await notificationService.getUnreadCount();

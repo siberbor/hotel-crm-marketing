@@ -17,8 +17,6 @@ export type UpdateBookingInput = Partial<
   CreateBookingInput & { status: Booking["status"]; paidAmount: string }
 >;
 
-const BOOKING_COUNT = { total: (sql: any) => sql`count(*)`.as("total") };
-
 import { sql } from "drizzle-orm";
 
 export async function getAllBookings(page = 1, limit = 20) {

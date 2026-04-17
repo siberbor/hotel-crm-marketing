@@ -60,7 +60,7 @@ export function GlobalSearch() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const goTo = (type: string, id: number) => {
+  const goTo = (type: string, _id: number) => {
     setIsOpen(false);
     setQuery("");
     if (type === "guest") router.push(`/guests`);

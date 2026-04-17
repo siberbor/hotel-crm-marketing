@@ -50,7 +50,7 @@ const DEMO_SEGMENTS: Segment[] = [
   },
 ];
 
-let segments = [...DEMO_SEGMENTS];
+const segments = [...DEMO_SEGMENTS];
 let nextId = 6;
 
 export async function getAllSegments() {

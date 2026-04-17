@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Card, Badge } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 
 const STEPS = [
   {

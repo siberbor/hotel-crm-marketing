@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, HTMLAttributes, forwardRef } from "react";
+import { HTMLAttributes, forwardRef } from "react";
 
 interface TableProps extends HTMLAttributes<HTMLTableElement> {}
 

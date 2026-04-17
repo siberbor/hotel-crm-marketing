@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Badge } from "./Badge";
 
 interface Notification {
   id: string;
@@ -17,7 +16,7 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ onClick }: NotificationBellProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -36,23 +35,6 @@ export function NotificationBell({ onClick }: NotificationBellProps) {
       }
     } catch (error) {
       console.error("Error fetching notifications:", error);
-    }
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "booking":
-        return "📅";
-      case "check_in":
-        return "🏨";
-      case "check_out":
-        return "🚪";
-      case "complaint":
-        return "⚠️";
-      case "campaign":
-        return "📧";
-      default:
-        return "🔔";
     }
   };
 

@@ -81,7 +81,7 @@ function saveKanbanIndex(data) {
 function parseSprintFile(content) {
   const tasks = [];
   const lines = content.split('\n');
-  let inTable = false;
+  const inTable = false;
 
   for (const line of lines) {
     // Detect markdown table with task data (| T## | ... | Status |)

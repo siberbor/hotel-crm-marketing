@@ -7,7 +7,7 @@ export type Notification = {
   createdAt: Date;
 };
 
-let notifications: Notification[] = [
+const notifications: Notification[] = [
   {
     id: "1",
     type: "booking",
@@ -34,13 +34,13 @@ let notifications: Notification[] = [
   },
 ];
 
-export async function getNotifications(userId?: number) {
+export async function getNotifications(_userId?: number) {
   return notifications.sort(
     (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
   );
 }
 
-export async function getUnreadCount(userId?: number) {
+export async function getUnreadCount(_userId?: number) {
   return notifications.filter((n) => !n.read).length;
 }
 
