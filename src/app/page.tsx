@@ -80,7 +80,7 @@ export default function Home() {
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Управляйте гостями, бронированиями и маркетингом в одном месте.
-            Автоматизация, аналитика и интеграции с каналами продаж.</p>
+            Автоматизация, аналитика и интеграции с каналами продаж.
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
