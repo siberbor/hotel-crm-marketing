@@ -35,6 +35,12 @@ const ENDPOINTS = [
     status: "✅",
   },
   {
+    method: "PATCH",
+    path: "/api/auth/me",
+    description: "Завершить онбординг",
+    status: "✅",
+  },
+  {
     method: "GET",
     path: "/api/guests",
     description: "Список гостей",
@@ -176,9 +182,19 @@ export default function ApiDocsPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-          API Документация
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            API Документация
+          </h1>
+          <a
+            href="/api/docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+          >
+            OpenAPI JSON ↗
+          </a>
+        </div>
 
         <Card>
           <CardTitle className="mb-4">Доступные эндпоинты</CardTitle>

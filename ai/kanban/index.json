@@ -1,161 +1,72 @@
 {
   "version": "1.0.0",
-  "updated": "2026-04-16",
-  "tasks": [
+  "updated": "2026-04-17",
+  "sprints": [
     {
-      "id": "T01",
-      "status": "done",
-      "col": "done"
+      "id": 0,
+      "name": "Foundation",
+      "tasks": ["T01","T02","T03","T04","T05","T06","T07","T08","T09","T10","T11","T12","T13","T14","T15","T16","T17","T18"]
     },
     {
-      "id": "T02",
-      "status": "done",
-      "col": "done"
+      "id": 1,
+      "name": "Critical Infrastructure",
+      "tasks": ["T19","T20","T21","T22","T23","T24"]
     },
     {
-      "id": "T03",
-      "status": "done",
-      "col": "done"
+      "id": 2,
+      "name": "Production Ready",
+      "tasks": ["T25","T26","T27","T28","T29","T30","T31"]
     },
     {
-      "id": "T04",
-      "status": "done",
-      "col": "done"
+      "id": 3,
+      "name": "API Completeness & Tests",
+      "tasks": ["T32","T33","T34","T35"]
     },
     {
-      "id": "T05",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T06",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T07",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T08",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T09",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T10",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T11",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T12",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T13",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T14",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T15",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T16",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T17",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T18",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T19",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T20",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T21",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T22",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T23",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T24",
-      "status": "done",
-      "col": "done"
-    },
-    {
-      "id": "T25",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T26",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T27",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T28",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T29",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T30",
-      "status": "todo",
-      "col": "todo"
-    },
-    {
-      "id": "T31",
-      "status": "todo",
-      "col": "todo"
+      "id": 4,
+      "name": "Production Hardening",
+      "tasks": ["T36","T37","T38","T39"]
     }
+  ],
+  "tasks": [
+    {"id":"T01","status":"done","col":"done"},
+    {"id":"T02","status":"done","col":"done"},
+    {"id":"T03","status":"done","col":"done"},
+    {"id":"T04","status":"done","col":"done"},
+    {"id":"T05","status":"done","col":"done"},
+    {"id":"T06","status":"done","col":"done"},
+    {"id":"T07","status":"done","col":"done"},
+    {"id":"T08","status":"done","col":"done"},
+    {"id":"T09","status":"done","col":"done"},
+    {"id":"T10","status":"done","col":"done"},
+    {"id":"T11","status":"done","col":"done"},
+    {"id":"T12","status":"done","col":"done"},
+    {"id":"T13","status":"done","col":"done"},
+    {"id":"T14","status":"done","col":"done"},
+    {"id":"T15","status":"done","col":"done"},
+    {"id":"T16","status":"done","col":"done"},
+    {"id":"T17","status":"done","col":"done"},
+    {"id":"T18","status":"done","col":"done"},
+    {"id":"T19","status":"done","col":"done"},
+    {"id":"T20","status":"done","col":"done"},
+    {"id":"T21","status":"done","col":"done"},
+    {"id":"T22","status":"done","col":"done"},
+    {"id":"T23","status":"done","col":"done"},
+    {"id":"T24","status":"done","col":"done"},
+    {"id":"T25","status":"done","col":"done"},
+    {"id":"T26","status":"done","col":"done"},
+    {"id":"T27","status":"done","col":"done"},
+    {"id":"T28","status":"done","col":"done"},
+    {"id":"T29","status":"done","col":"done"},
+    {"id":"T30","status":"done","col":"done"},
+    {"id":"T31","status":"done","col":"done"},
+    {"id":"T32","status":"done","col":"done"},
+    {"id":"T33","status":"done","col":"done"},
+    {"id":"T34","status":"done","col":"done"},
+    {"id":"T35","status":"done","col":"done"},
+    {"id":"T36","status":"todo","col":"todo"},
+    {"id":"T37","status":"todo","col":"todo"},
+    {"id":"T38","status":"done","col":"done"},
+    {"id":"T39","status":"done","col":"done"}
   ]
 }

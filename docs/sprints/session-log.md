@@ -88,3 +88,39 @@ Format: ## Session [DATE TIME] → Done / Blocked / Decisions / Next
 - testTimeout: 15000ms in vitest.config.api.ts (DB connect_timeout is 5s, need margin)
 
 **Next:** Sprint 3 planning. Candidates: real PostgreSQL integration, E2E tests with Playwright, channel manager integration, onboarding flow, reports/analytics.
+
+
+## Session 2026-04-18 — T39 Onboarding done, Sprint 3 started
+
+**Done:**
+- T39: Onboarding complete flow
+  - GET /api/auth/me теперь возвращает onboardingCompleted в ответе
+  - PATCH /api/auth/me — устанавливает onboarding_completed=true в БД (graceful при отсутствии БД)
+  - onboarding/page.tsx: handleNext (последний шаг) и handleSkip вызывают PATCH перед router.push
+  - AppShell.tsx: после загрузки юзера — редирект на /onboarding если onboardingCompleted===false
+- Sprint 3 создан (T36–T39), T39 done
+
+**Blocked:** None
+
+**Decisions:**
+- PATCH /api/auth/me не принимает body — всегда ставит onboardingCompleted=true (нет других полей для обновления пока)
+- DB unavailable: PATCH возвращает {ok:true} без ошибки — онбординг best-effort
+- AppShell пропускает редирект если pathname уже /onboarding (избегаем loop)
+
+**Next:** T36 (db:seed) → T37 (Playwright E2E) → T38 (OpenAPI) параллельно
+
+## Session 2026-04-18 — T38 OpenAPI docs done
+
+**Done:**
+- T38: OpenAPI спек расширен до всех 20+ эндпоинтов (auth, guests, bookings, rooms, interactions, campaigns, segments, search, channels, reports, notifications, health)
+- Добавлены tags, параметры, requestBody, responses для каждого пути
+- PATCH /api/auth/me добавлен в спек и в таблицу на /api-docs
+- Кнопка "OpenAPI JSON ↗" на странице /api-docs открывает raw JSON в новой вкладке
+
+**Blocked:** None
+
+**Decisions:**
+- Спек хранится в route.ts как JS-объект (не YAML файл) — проще поддерживать без доп. зависимостей
+- security: [] на /api/auth/login и /api/health — публичные эндпоинты
+
+**Next:** T36 (db:seed реальные данные) или T37 (Playwright E2E)
