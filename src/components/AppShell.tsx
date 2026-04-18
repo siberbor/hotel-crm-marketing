@@ -17,15 +17,21 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
+  const [user, setUser] = useState<{ name: string; role: string; onboardingCompleted?: boolean } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => setUser(d.data?.user))
+      .then((d) => {
+        const u = d.data?.user;
+        setUser(u);
+        if (u && u.onboardingCompleted === false && pathname !== "/onboarding") {
+          router.push("/onboarding");
+        }
+      })
       .catch(() => router.push("/login"));
-  }, [router]);
+  }, [router, pathname]);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });

@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "dev:ws": "tsx server.ts",
+    "dev:workers": "tsx src/workers/start.ts",
     "dev:api": "fastify start -w src/server.ts",
     "build": "next build",
     "start": "next start",

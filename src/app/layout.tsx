@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { QueryProvider } from "@/components/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Hotel CRM",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

@@ -19,6 +19,15 @@ export async function getAllInteractions(page = 1, limit = 20) {
   return { data, total: Number(count), page, limit };
 }
 
+export async function getInteractionById(id: number) {
+  const [row] = await db
+    .select()
+    .from(interactions)
+    .where(eq(interactions.id, id))
+    .limit(1);
+  return row || null;
+}
+
 export async function getInteractionsByGuest(guestId: number) {
   return db
     .select()

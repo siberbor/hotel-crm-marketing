@@ -23,7 +23,8 @@ export async function getAllGuests(page = 1, limit = 20) {
       db.select().from(guests).limit(limit).offset(offset).orderBy(guests.createdAt),
       db.select({ total: sql<number>`count(*)` }).from(guests),
     ]);
-    return { data, total: Number(total), page, limit };
+    if (Number(total) > 0) return { data, total: Number(total), page, limit };
+    return demoStore.getGuests(page, limit) as unknown as { data: Guest[]; total: number; page: number; limit: number };
   } catch {
     return demoStore.getGuests(page, limit) as unknown as { data: Guest[]; total: number; page: number; limit: number };
   }

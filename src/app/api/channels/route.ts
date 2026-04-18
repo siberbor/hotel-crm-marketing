@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as syncService from "@/services/sync.service";
+import { getSyncQueue } from "@/lib/queues";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,7 +12,7 @@ export async function GET(request: Request) {
     const result = await syncService.getAllSyncLogs(page, limit);
 
     if (channel) {
-      result.data = result.data.filter((log: any) => log.channel === channel);
+      result.data = result.data.filter((log: { channel: string }) => log.channel === channel);
       result.total = result.data.length;
     }
 
@@ -21,7 +22,7 @@ export async function GET(request: Request) {
       page: result.page,
       limit: result.limit,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Ошибка получения логов" } },
       { status: 500 },
@@ -32,18 +33,19 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { channel } = body;
+    const { type = "full_sync" } = body as { type?: "full_sync" | "push_rates" | "fetch_bookings" };
 
-    if (!channel) {
-      return NextResponse.json(
-        { error: { code: "VALIDATION_ERROR", message: "Канал обязателен" } },
-        { status: 400 },
-      );
+    if (process.env.REDIS_URL) {
+      const queue = getSyncQueue();
+      const job = await queue.add(type, { type });
+      return NextResponse.json({ data: { queued: true, jobId: job.id, type } });
     }
 
-    const result = await syncService.syncWithChannel(channel);
-    return NextResponse.json({ data: result });
-  } catch (error) {
+    // Fallback: direct sync when Redis unavailable
+    const { channelManagerService } = await import("@/integrations/channel-manager");
+    const result = await channelManagerService.fetchBookings();
+    return NextResponse.json({ data: { queued: false, ...result } });
+  } catch {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Ошибка синхронизации" } },
       { status: 500 },

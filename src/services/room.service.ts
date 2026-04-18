@@ -6,7 +6,8 @@ export type Room = DbRoom;
 
 export async function getAllRooms() {
   try {
-    return await db.select().from(rooms).where(eq(rooms.isActive, true)).orderBy(asc(rooms.number));
+    const result = await db.select().from(rooms).where(eq(rooms.isActive, true)).orderBy(asc(rooms.number));
+    return result.length > 0 ? result : (demoStore.getRooms() as unknown as Room[]);
   } catch {
     return demoStore.getRooms() as unknown as Room[];
   }
