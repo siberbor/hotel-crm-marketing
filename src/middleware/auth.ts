@@ -17,7 +17,7 @@ const PUBLIC_PATHS = [
 const GUEST_PROTECTED_PREFIXES = ["/guest/bookings", "/guest/services"];
 
 // Маршруты staff portal — требуют scope=staff (или любую CRM роль)
-const STAFF_PORTAL_PREFIXES = ["/staff/rooms", "/staff/tasks", "/staff/employees", "/staff/checkin"];
+const STAFF_PORTAL_PREFIXES = ["/staff/rooms", "/staff/tasks", "/staff/employees", "/staff/checkin", "/api/tasks", "/api/shifts"];
 
 function unauthorized(message = "Требуется авторизация") {
   return NextResponse.json(
