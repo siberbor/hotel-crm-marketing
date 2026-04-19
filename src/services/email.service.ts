@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { db, campaigns, guests, bookings, rooms } from "@/db";
-import { eq, inArray } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { demoStore } from "@/lib/demo-store";
 
 function getResend(): Resend | null {

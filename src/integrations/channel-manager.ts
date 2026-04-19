@@ -10,7 +10,7 @@
  */
 
 import { and, eq } from "drizzle-orm";
-import { db, syncLogs, rooms, guests, bookings } from "@/db";
+import { db, syncLogs, rooms, guests } from "@/db";
 import { checkRoomConflict, createBooking } from "@/services/booking.service";
 
 // ─── External API types (matches typical Channel Manager response) ────────────

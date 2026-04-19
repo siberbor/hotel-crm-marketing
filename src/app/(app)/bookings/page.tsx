@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Button, Badge, Modal, Input } from "@/components/ui";
+import { Button, Modal, Input } from "@/components/ui";
 
 interface Booking {
   id: number;

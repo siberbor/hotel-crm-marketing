@@ -160,6 +160,67 @@ export const syncLogs = pgTable(
   }),
 );
 
+// Sprint 5: guest_accounts, tasks, shifts
+
+export const guestAccounts = pgTable(
+  "guest_accounts",
+  {
+    id: serial("id").primaryKey(),
+    guestId: integer("guest_id")
+      .notNull()
+      .references(() => guests.id),
+    email: varchar("email", { length: 255 }).notNull().unique(),
+    passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    emailIdx: index("guest_accounts_email_idx").on(table.email),
+    guestIdx: index("guest_accounts_guest_idx").on(table.guestId),
+  }),
+);
+
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: serial("id").primaryKey(),
+    title: varchar("title", { length: 255 }).notNull(),
+    // todo | in_progress | urgent | done | postponed
+    status: varchar("status", { length: 50 }).notNull().default("todo"),
+    assignedTo: integer("assigned_to").references(() => users.id),
+    roomId: integer("room_id").references(() => rooms.id),
+    scheduledTime: timestamp("scheduled_time"),
+    notes: text("notes"),
+    createdBy: integer("created_by").references(() => users.id),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    statusIdx: index("tasks_status_idx").on(table.status),
+    assignedIdx: index("tasks_assigned_idx").on(table.assignedTo),
+    roomIdx: index("tasks_room_idx").on(table.roomId),
+  }),
+);
+
+export const shifts = pgTable(
+  "shifts",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    startedAt: timestamp("started_at").notNull().defaultNow(),
+    endedAt: timestamp("ended_at"),
+    // working | break | done
+    status: varchar("status", { length: 50 }).notNull().default("working"),
+    createdAt: timestamp("created_at").defaultNow(),
+  },
+  (table) => ({
+    userIdx: index("shifts_user_idx").on(table.userId),
+    statusIdx: index("shifts_status_idx").on(table.status),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type Guest = typeof guests.$inferSelect;
 export type Room = typeof rooms.$inferSelect;
@@ -168,3 +229,6 @@ export type Interaction = typeof interactions.$inferSelect;
 export type Campaign = typeof campaigns.$inferSelect;
 export type Permission = typeof permissions.$inferSelect;
 export type SyncLog = typeof syncLogs.$inferSelect;
+export type GuestAccount = typeof guestAccounts.$inferSelect;
+export type Task = typeof tasks.$inferSelect;
+export type Shift = typeof shifts.$inferSelect;

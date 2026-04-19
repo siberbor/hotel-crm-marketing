@@ -12,6 +12,8 @@ export interface TokenPayload {
   userId: number;
   email: string;
   role: string;
+  scope?: "staff" | "guest";
+  guestId?: number;
 }
 
 export async function createToken(payload: TokenPayload): Promise<string> {
@@ -19,6 +21,18 @@ export async function createToken(payload: TokenPayload): Promise<string> {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("15m")
+    .sign(secret);
+}
+
+export async function createGuestToken(payload: {
+  userId: number;
+  email: string;
+  guestId: number;
+}): Promise<string> {
+  return new SignJWT({ ...payload, role: "guest", scope: "guest" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("30d")
     .sign(secret);
 }
 

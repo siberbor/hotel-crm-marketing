@@ -1,274 +1,362 @@
 import Link from "next/link";
+import * as roomService from "@/services/room.service";
+import "@/styles/tokens-green.css";
 
-export default function Home() {
-  const features = [
-    {
-      icon: "👥",
-      title: "Управление гостями",
-      desc: "Полная база гостей с историей посещений, предпочтениями и тегами",
-    },
-    {
-      icon: "📅",
-      title: "Бронирования",
-      desc: "Полный цикл бронирования: от создания до выселения",
-    },
-    {
-      icon: "📧",
-      title: "Email-маркетинг",
-      desc: "Создавайте кампании и отправляйте письма гостям",
-    },
-    {
-      icon: "📊",
-      title: "Аналитика",
-      desc: "Отчёты о загрузке, выручке и эффективности",
-    },
-    {
-      icon: "🔗",
-      title: "Интеграции",
-      desc: "Синхронизация с Booking.com, Airbnb и другими каналами",
-    },
-    {
-      icon: "🔔",
-      title: "Уведомления",
-      desc: "Real-time уведомления о новых бронированиях и событиях",
-    },
-  ];
+export const dynamic = "force-dynamic";
+
+const ROOM_TYPE_LABELS: Record<string, string> = {
+  suite: "Сюит",
+  junior_suite: "Джуниор сюит",
+  family: "Фемили сюит",
+  standard: "Стандарт",
+  deluxe: "Делюкс",
+};
+
+const AMENITY_ICONS: Record<string, string> = {
+  wifi: "Wi-Fi",
+  tv: "ТВ",
+  minibar: "Мини-бар",
+  jacuzzi: "Джакузи",
+  balcony: "Балкон",
+  ac: "Кондиционер",
+  safe: "Сейф",
+  bathrobes: "Халаты",
+};
+
+export default async function HotelHomePage() {
+  const rooms = await roomService.getAllRooms();
 
   return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-b border-gray-100 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🏨</span>
-            <span className="text-xl font-bold text-gray-900">Hotel CRM</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-6">
-            <a
-              href="#features"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              Возможности
-            </a>
-            <a
-              href="#pricing"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              Тарифы
-            </a>
-            <a
-              href="#contacts"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              Контакты
-            </a>
-            <Link
-              href="/login"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Вход в систему
-            </Link>
-          </nav>
+    <div className="green-theme" style={{ background: "var(--g-bg)", color: "var(--g-text)", fontFamily: "Inter, system-ui, sans-serif", minHeight: "100vh" }}>
+
+      {/* HEADER */}
+      <header style={{
+        position: "sticky", top: 0, zIndex: 100,
+        background: "var(--g-header-bg)",
+        color: "var(--g-header-text)",
+        padding: "0 24px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        height: 60,
+        boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 22, fontWeight: 700, color: "var(--g-primary)", letterSpacing: "-0.5px" }}>
+            MarkG
+          </span>
+          <span style={{ fontSize: 22, fontWeight: 300, color: "#fff" }}>Hotel</span>
         </div>
+
+        <nav style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <a href="#rooms" style={{ color: "var(--g-header-sub)", fontSize: 14, textDecoration: "none", transition: "color .15s" }}
+            onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+            onMouseLeave={e => (e.currentTarget.style.color = "var(--g-header-sub)")}>
+            Номера
+          </a>
+          <a href="#amenities" style={{ color: "var(--g-header-sub)", fontSize: 14, textDecoration: "none" }}>
+            Услуги
+          </a>
+          <a href="#contacts" style={{ color: "var(--g-header-sub)", fontSize: 14, textDecoration: "none" }}>
+            Контакты
+          </a>
+          <Link href="/guest/login" style={{
+            background: "var(--g-primary)", color: "#fff",
+            padding: "8px 18px", borderRadius: "var(--g-radius-md)",
+            fontSize: 14, fontWeight: 600, textDecoration: "none",
+            transition: "background .15s",
+          }}>
+            Личный кабинет
+          </Link>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            CRM для современного <span className="text-blue-600">отеля</span>
+      {/* HERO */}
+      <section style={{
+        position: "relative",
+        minHeight: 540,
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        textAlign: "center",
+        padding: "80px 24px",
+        background: "linear-gradient(135deg, #1a1a1a 0%, #2d3a1a 50%, #1a2a0a 100%)",
+        overflow: "hidden",
+      }}>
+        {/* Decorative overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "radial-gradient(ellipse at center, rgba(124,179,66,0.15) 0%, transparent 70%)",
+          pointerEvents: "none",
+        }} />
+
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 640 }}>
+          <div style={{
+            display: "inline-block",
+            background: "rgba(124,179,66,0.2)", border: "1px solid rgba(124,179,66,0.4)",
+            color: "var(--g-primary-light)", borderRadius: "var(--g-radius-pill)",
+            padding: "4px 16px", fontSize: 13, marginBottom: 24,
+          }}>
+            Добро пожаловать
+          </div>
+
+          <h1 style={{
+            fontSize: "clamp(32px, 6vw, 56px)", fontWeight: 700,
+            color: "#ffffff", lineHeight: 1.2, marginBottom: 20,
+          }}>
+            Отдых, который<br />
+            <span style={{ color: "var(--g-primary)" }}>вы заслужили</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Управляйте гостями, бронированиями и маркетингом в одном месте.
-            Автоматизация, аналитика и интеграции с каналами продаж.
+
+          <p style={{
+            fontSize: 18, color: "rgba(255,255,255,0.7)",
+            lineHeight: 1.6, marginBottom: 40, maxWidth: 480, margin: "0 auto 40px",
+          }}>
+            Уютные номера, спа-зона и первоклассный сервис для вашего незабываемого отдыха.
           </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, i) => (
-              <div
-                key={i}
-                className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-              >
-                <div className="text-3xl mb-4">{feature.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600">{feature.desc}</p>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <a href="#rooms" style={{
+              background: "var(--g-primary)", color: "#fff",
+              padding: "14px 32px", borderRadius: "var(--g-radius-md)",
+              fontWeight: 600, fontSize: 16, textDecoration: "none",
+              transition: "background .15s",
+            }}>
+              Смотреть номера
+            </a>
+            <Link href="/guest/login" style={{
+              background: "transparent",
+              border: "1.5px solid rgba(255,255,255,0.3)",
+              color: "#fff", padding: "14px 32px",
+              borderRadius: "var(--g-radius-md)",
+              fontWeight: 500, fontSize: 16, textDecoration: "none",
+            }}>
+              Личный кабинет
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section style={{
+        background: "var(--g-header-bg)", color: "#fff",
+        padding: "32px 24px",
+        display: "flex", justifyContent: "center", gap: 64,
+        flexWrap: "wrap",
+      }}>
+        {[
+          { value: rooms.length, label: "Номеров" },
+          { value: "5★", label: "Категория" },
+          { value: "24/7", label: "Сервис" },
+          { value: "SPA", label: "Комплекс" },
+        ].map((s) => (
+          <div key={s.label} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 32, fontWeight: 700, color: "var(--g-primary)" }}>{s.value}</div>
+            <div style={{ fontSize: 14, color: "var(--g-header-sub)", marginTop: 4 }}>{s.label}</div>
+          </div>
+        ))}
+      </section>
+
+      {/* ROOMS */}
+      <section id="rooms" style={{ padding: "80px 24px", maxWidth: 1100, margin: "0 auto" }}>
+        <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, textAlign: "center" }}>Наши номера</h2>
+        <p style={{ color: "var(--g-text-secondary)", textAlign: "center", marginBottom: 48 }}>
+          Каждый номер — это пространство для вашего комфорта
+        </p>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: 24,
+        }}>
+          {rooms.map((room) => (
+            <div key={room.id} className="g-card" style={{ overflow: "hidden", transition: "box-shadow .2s" }}>
+              {/* Room image placeholder */}
+              <div style={{
+                height: 180,
+                background: `linear-gradient(135deg, #2d3a1a, #1a2a0a)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                position: "relative",
+              }}>
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "radial-gradient(ellipse at center, rgba(124,179,66,0.2) 0%, transparent 70%)",
+                }} />
+                <span style={{ fontSize: 48, opacity: 0.6 }}>🛏</span>
+                <div style={{
+                  position: "absolute", top: 12, right: 12,
+                  background: "var(--g-primary)", color: "#fff",
+                  padding: "4px 10px", borderRadius: "var(--g-radius-pill)",
+                  fontSize: 12, fontWeight: 600,
+                }}>
+                  №{room.number}
+                </div>
+              </div>
+
+              <div style={{ padding: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
+                    {ROOM_TYPE_LABELS[room.type] ?? room.type}
+                  </h3>
+                  <span style={{ color: "var(--g-primary)", fontWeight: 700, fontSize: 16, whiteSpace: "nowrap" }}>
+                    {Number(room.pricePerNight).toLocaleString("ru-RU")} ₽<span style={{ fontWeight: 400, fontSize: 12, color: "var(--g-text-secondary)" }}>/ночь</span>
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", gap: 16, marginBottom: 12, color: "var(--g-text-secondary)", fontSize: 13 }}>
+                  <span>👥 до {room.capacity} гостей</span>
+                  <span>🏢 {room.floor} этаж</span>
+                </div>
+
+                {Array.isArray(room.amenities) && room.amenities.length > 0 && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
+                    {(room.amenities as string[]).slice(0, 4).map((a) => (
+                      <span key={a} style={{
+                        background: "var(--g-primary-bg)", color: "var(--g-primary-hover)",
+                        borderRadius: "var(--g-radius-pill)",
+                        padding: "2px 10px", fontSize: 12,
+                      }}>
+                        {AMENITY_ICONS[a] ?? a}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <Link href="/guest/login" style={{
+                  display: "block", width: "100%", textAlign: "center",
+                  background: "var(--g-primary)", color: "#fff",
+                  padding: "10px", borderRadius: "var(--g-radius-md)",
+                  fontWeight: 600, fontSize: 14, textDecoration: "none",
+                  transition: "background .15s",
+                }}>
+                  Забронировать
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {rooms.length === 0 && (
+          <p style={{ textAlign: "center", color: "var(--g-text-secondary)", padding: 40 }}>
+            Номера загружаются...
+          </p>
+        )}
+      </section>
+
+      {/* AMENITIES */}
+      <section id="amenities" style={{ background: "#fff", padding: "80px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <h2 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, textAlign: "center" }}>Услуги отеля</h2>
+          <p style={{ color: "var(--g-text-secondary)", textAlign: "center", marginBottom: 48 }}>
+            Всё для вашего комфорта и отдыха
+          </p>
+
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+            gap: 24,
+          }}>
+            {[
+              { icon: "🏊", title: "Бассейн", desc: "Открытый и закрытый" },
+              { icon: "💆", title: "СПА-центр", desc: "Массаж и процедуры" },
+              { icon: "🍽", title: "Ресторан", desc: "Европейская кухня" },
+              { icon: "🏋", title: "Фитнес", desc: "Современное оборудование" },
+              { icon: "🧖", title: "Сауна", desc: "Русская баня и хаммам" },
+              { icon: "🎱", title: "Бильярд", desc: "Два стола" },
+              { icon: "🚗", title: "Парковка", desc: "Бесплатно для гостей" },
+              { icon: "📶", title: "Wi-Fi", desc: "Везде и бесплатно" },
+            ].map((s) => (
+              <div key={s.title} style={{
+                padding: 24, borderRadius: "var(--g-radius-md)",
+                border: "1px solid var(--g-border)",
+                transition: "border-color .2s, box-shadow .2s",
+              }}>
+                <div style={{ fontSize: 36, marginBottom: 12 }}>{s.icon}</div>
+                <h3 style={{ fontSize: 15, fontWeight: 600, marginBottom: 4 }}>{s.title}</h3>
+                <p style={{ fontSize: 13, color: "var(--g-text-secondary)", margin: 0 }}>{s.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-4">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-4">
-            Простые тарифы
-          </h2>
-          <p className="text-center text-gray-600 mb-12">
-            Платите только за то, что используете
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Старт
-              </h3>
-              <p className="text-3xl font-bold text-gray-900 mb-4">
-                ₽0
-                <span className="text-sm font-normal text-gray-500">/мес</span>
-              </p>
-              <ul className="space-y-2 text-gray-600 mb-6">
-                <li>✓ До 5 пользователей</li>
-                <li>✓ 100 гостей</li>
-                <li>✓ Базовая аналитика</li>
-              </ul>
-              <Link
-                href="/login"
-                className="block w-full py-2 text-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Начать
-              </Link>
-            </div>
-
-            <div className="bg-blue-600 p-6 rounded-xl shadow-lg">
-              <div className="inline-block px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full mb-4">
-                Популярный
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Бизнес</h3>
-              <p className="text-3xl font-bold text-white mb-4">
-                ₽9,900
-                <span className="text-sm font-normal text-blue-200">/мес</span>
-              </p>
-              <ul className="space-y-2 text-blue-100 mb-6">
-                <li>✓ До 20 пользователей</li>
-                <li>✓ Безлимитные гости</li>
-                <li>✓ Все интеграции</li>
-                <li>✓ Email-рассылки</li>
-                <li>✓ Приоритетная поддержка</li>
-              </ul>
-              <Link
-                href="/login"
-                className="block w-full py-2 text-center bg-white text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition-colors"
-              >
-                Попробовать
-              </Link>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Премиум
-              </h3>
-              <p className="text-3xl font-bold text-gray-900 mb-4">
-                ₽24,900
-                <span className="text-sm font-normal text-gray-500">/мес</span>
-              </p>
-              <ul className="space-y-2 text-gray-600 mb-6">
-                <li>✓ Безлимит пользователей</li>
-                <li>✓ Персональный менеджер</li>
-                <li>✓ SLA 99.9%</li>
-                <li>✓ Индивидуальная интеграция</li>
-              </ul>
-              <Link
-                href="/login"
-                className="block w-full py-2 text-center border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Связаться
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="py-20 px-4 bg-blue-600">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Готовы улучшить управление отелем?
-          </h2>
-          <p className="text-blue-100 mb-8 text-lg">
-            Начните бесплатно уже сегодня. Настройка занимает 5 минут.
-          </p>
-          <Link
-            href="/login"
-            className="inline-block px-8 py-4 bg-white text-blue-600 text-lg font-medium rounded-xl hover:bg-blue-50 transition-colors"
-          >
-            Попробовать бесплатно
-          </Link>
-        </div>
+      <section style={{
+        background: "var(--g-header-bg)", padding: "80px 24px", textAlign: "center",
+      }}>
+        <h2 style={{ fontSize: 32, fontWeight: 700, color: "#fff", marginBottom: 16 }}>
+          Уже бронировали у нас?
+        </h2>
+        <p style={{ color: "rgba(255,255,255,0.6)", marginBottom: 32, fontSize: 16 }}>
+          Войдите в личный кабинет, чтобы управлять бронированием и заказывать услуги
+        </p>
+        <Link href="/guest/login" style={{
+          display: "inline-block",
+          background: "var(--g-primary)", color: "#fff",
+          padding: "16px 40px", borderRadius: "var(--g-radius-md)",
+          fontWeight: 700, fontSize: 16, textDecoration: "none",
+        }}>
+          Войти в личный кабинет
+        </Link>
       </section>
 
-      {/* Footer */}
-      <footer id="contacts" className="py-12 px-4 bg-gray-900 text-gray-400">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+      {/* FOOTER */}
+      <footer id="contacts" style={{
+        background: "#111", color: "rgba(255,255,255,0.5)",
+        padding: "48px 24px 24px",
+      }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 32, marginBottom: 40 }}>
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">🏨</span>
-                <span className="text-xl font-bold text-white">Hotel CRM</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <span style={{ fontSize: 18, fontWeight: 700, color: "var(--g-primary)" }}>MarkG</span>
+                <span style={{ fontSize: 18, color: "#fff" }}>Hotel</span>
               </div>
-              <p className="text-sm">
-                Современная CRM система для управления отелем любого размера.
+              <p style={{ fontSize: 13, lineHeight: 1.6 }}>
+                Место, где каждая деталь создана для вашего комфорта.
               </p>
             </div>
+
             <div>
-              <h4 className="text-white font-medium mb-4">Продукт</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a
-                    href="#features"
-                    className="hover:text-white transition-colors"
-                  >
-                    Возможности
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#pricing"
-                    className="hover:text-white transition-colors"
-                  >
-                    Тарифы
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Интеграции
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">Компания</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    О нас
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Блог
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white transition-colors">
-                    Контакты
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-medium mb-4">Контакты</h4>
-              <ul className="space-y-2 text-sm">
-                <li>📧 info@hotelcrm.ru</li>
+              <h4 style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Контакты</h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 13, lineHeight: 2 }}>
                 <li>📞 +7 (999) 000-00-00</li>
-                <li>📍 Москва, ул. Примерная 1</li>
+                <li>📧 info@markghotel.ru</li>
+                <li>📍 ул. Примерная, 1</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Гостям</h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 13, lineHeight: 2 }}>
+                <li><a href="#rooms" style={{ color: "inherit", textDecoration: "none" }}>Номера</a></li>
+                <li><a href="#amenities" style={{ color: "inherit", textDecoration: "none" }}>Услуги</a></li>
+                <li>
+                  <Link href="/guest/login" style={{ color: "var(--g-primary)", textDecoration: "none" }}>
+                    Личный кабинет
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ color: "#fff", fontSize: 14, fontWeight: 600, marginBottom: 12 }}>Персонал</h4>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, fontSize: 13, lineHeight: 2 }}>
+                <li>
+                  <Link href="/staff/login" style={{ color: "inherit", textDecoration: "none" }}>
+                    Портал сотрудника
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" style={{ color: "inherit", textDecoration: "none" }}>
+                    CRM система
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-gray-800 text-sm text-center">
-            © 2024 Hotel CRM. Все права защищены.
+
+          <div style={{
+            borderTop: "1px solid rgba(255,255,255,0.08)",
+            paddingTop: 24, textAlign: "center", fontSize: 12,
+          }}>
+            © {new Date().getFullYear()} MarkG Hotel. Все права защищены.
           </div>
         </div>
       </footer>
