@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const SwaggerUI = dynamic(
+  () => import("@/components/SwaggerUI").then((m) => ({ default: m.SwaggerUI })),
+  { ssr: false, loading: () => <div className="p-8 text-center text-gray-500">Загрузка Swagger UI...</div> }
+);
 import {
   Button,
   Card,
@@ -235,6 +241,11 @@ export default function ApiDocsPage() {
               ))}
             </TableBody>
           </Table>
+        </Card>
+
+        <Card className="mt-6 overflow-hidden">
+          <CardTitle className="mb-4 p-6 pb-0">Swagger UI</CardTitle>
+          <SwaggerUI url="/api/docs" />
         </Card>
       </main>
     </div>

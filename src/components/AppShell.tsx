@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const OnboardingTour = dynamic(
+  () => import("./OnboardingTour").then((m) => ({ default: m.OnboardingTour })),
+  { ssr: false }
+);
 
 const NAV = [
   { href: "/dashboard", label: "Дашборд", icon: "⊞" },
@@ -145,6 +151,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      <OnboardingTour role={user.role} />
     </div>
   );
 }

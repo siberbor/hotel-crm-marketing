@@ -42,6 +42,9 @@ FROM base AS worker
 WORKDIR /app
 ENV NODE_ENV=production
 
+# pg_dump needed for daily backup job (src/jobs/backup.ts)
+RUN apk add --no-cache postgresql-client
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 

@@ -10,11 +10,28 @@
 ### Memory Protocol
 At the START of every session:
 ```
-1. Read docs/sprints/current-sprint.md
+1. Read docs/sprints/current-sprint.md          ← активный спринт и задачи
 2. Read docs/sprints/session-log.md (last 20 lines)
-3. Check docs/decisions/ for any recent ADRs
-4. ONLY THEN start working
+3. Read docs/sprints/sprint5-staff-portal-guest-lk.md  ← если Sprint 5 активен
+4. Check docs/decisions/ for any recent ADRs
+5. ONLY THEN start working
 ```
+
+### Sprint 5 Quick Context (auto-load)
+Active sprint: **Sprint 5 — Hotel Website + Staff Portal + Guest LK**
+Design refs: `landing/*.png` (зелёный брендинг)
+
+URL map:
+- `/`            → витрина отеля (REPLACE page.tsx, зелёный)
+- `/guest/*`     → личный кабинет гостя (email+пароль, JWT scope=guest)
+- `/staff/*`     → operations portal (Номера/Задачи/Сотрудники/Check-in)
+- `/login`+`/app/*` → CRM (синий, НЕ ТРОГАТЬ)
+
+Start order: Блок 1 (DB+JWT+middleware+CSS) → Блок 2 (витрина) → Блок 3 (ЛК) → Блок 4 (staff)
+
+New DB tables needed: `guest_accounts`, `tasks`, `shifts`
+New files: `src/styles/tokens-green.css`, `src/app/(staff)/`, `src/app/(guest)/`
+Touch: `src/db/schema.ts`, `src/auth/jwt.ts`, `src/middleware/auth.ts`, `src/app/page.tsx`
 
 At the END of every session, append to `docs/sprints/session-log.md`:
 ```markdown

@@ -7,7 +7,7 @@ export type CreateCampaignInput = {
   name: string;
   subject: string;
   content: string;
-  segmentId?: number;
+  segmentId?: number | null;
 };
 
 export async function getAllCampaigns(page = 1, limit = 20) {

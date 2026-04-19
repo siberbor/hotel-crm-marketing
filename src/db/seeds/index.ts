@@ -1,4 +1,5 @@
 import { drizzle } from "drizzle-orm/postgres-js";
+import { sql } from "drizzle-orm";
 import postgres from "postgres";
 import * as schema from "../schema";
 
@@ -14,7 +15,7 @@ async function main() {
 
   // Clear existing data
   await db.execute(
-    "TRUNCATE TABLE sync_logs, campaigns, interactions, bookings, guests, rooms, users, permissions RESTART IDENTITY CASCADE;",
+    sql`TRUNCATE TABLE sync_logs, campaigns, interactions, bookings, guests, rooms, users, permissions RESTART IDENTITY CASCADE`,
   );
 
   // Users with bcrypt hashes (bcrypt of: admin123, manager123, marketing123, reception123)

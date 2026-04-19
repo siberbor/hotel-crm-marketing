@@ -1,4 +1,4 @@
-import { eq, or, sql } from "drizzle-orm";
+import { and, eq, gt, lt, not, inArray, or, sql } from "drizzle-orm";
 import { db, bookings, type Booking as DbBooking } from "@/db";
 import { demoStore } from "@/lib/demo-store";
 
@@ -100,6 +100,29 @@ export async function updateBooking(id: number, input: UpdateBookingInput) {
 
 export async function updateBookingStatus(id: number, status: Booking["status"]) {
   return updateBooking(id, { status });
+}
+
+export async function checkRoomConflict(
+  roomId: number,
+  checkIn: Date,
+  checkOut: Date,
+  excludeBookingId?: number
+): Promise<boolean> {
+  const conditions = [
+    eq(bookings.roomId, roomId),
+    not(inArray(bookings.status, ["cancelled"])),
+    lt(bookings.checkInDate, checkOut),
+    gt(bookings.checkOutDate, checkIn),
+  ];
+  if (excludeBookingId) {
+    conditions.push(not(eq(bookings.id, excludeBookingId)));
+  }
+  const result = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(and(...conditions))
+    .limit(1);
+  return result.length > 0;
 }
 
 export async function deleteBooking(id: number) {

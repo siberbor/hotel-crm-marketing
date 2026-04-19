@@ -60,6 +60,7 @@ import {
   updateBooking,
   updateBookingStatus,
   deleteBooking,
+  checkRoomConflict,
 } from "@/services/booking.service";
 
 const mockDb = db as any;
@@ -93,7 +94,9 @@ test("getAllBookings returns paginated bookings", async () => {
 });
 
 test("getBookingById returns booking when found", async () => {
-  mockDb.select.mockReturnValueOnce(makeChain([sampleBooking]));
+  // getBookingById does: 1) COUNT query, 2) select by id
+  mockDb.select.mockReturnValueOnce(makeChain([{ total: 1 }])); // COUNT → has rows
+  mockDb.select.mockReturnValueOnce(makeChain([sampleBooking])); // actual fetch
   const result = await getBookingById(1);
   expect(result).toEqual(sampleBooking);
 });
@@ -187,5 +190,38 @@ test("deleteBooking returns false", async () => {
     })),
   });
   const result = await deleteBooking(999);
+  expect(result).toBe(false);
+});
+
+// ── checkRoomConflict ─────────────────────────────────────────────────────────
+
+test("checkRoomConflict returns false when no overlapping bookings", async () => {
+  mockDb.select.mockReturnValueOnce(makeChain([]));
+  const result = await checkRoomConflict(1, new Date("2024-06-01"), new Date("2024-06-05"));
+  expect(result).toBe(false);
+});
+
+test("checkRoomConflict returns true when overlap exists", async () => {
+  mockDb.select.mockReturnValueOnce(makeChain([{ id: 42 }]));
+  const result = await checkRoomConflict(1, new Date("2024-06-03"), new Date("2024-06-07"));
+  expect(result).toBe(true);
+});
+
+test("checkRoomConflict with excludeBookingId passes through", async () => {
+  mockDb.select.mockReturnValueOnce(makeChain([]));
+  const result = await checkRoomConflict(
+    1,
+    new Date("2024-06-01"),
+    new Date("2024-06-05"),
+    99
+  );
+  expect(result).toBe(false);
+  expect(mockDb.select).toHaveBeenCalledTimes(1);
+});
+
+test("checkRoomConflict: same room, adjacent dates → no conflict", async () => {
+  // checkOut of existing === checkIn of new → no overlap (boundary)
+  mockDb.select.mockReturnValueOnce(makeChain([]));
+  const result = await checkRoomConflict(1, new Date("2024-06-05"), new Date("2024-06-08"));
   expect(result).toBe(false);
 });

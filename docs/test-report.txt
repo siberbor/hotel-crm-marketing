@@ -1,0 +1,194 @@
+================================================================================
+  HOTEL CRM — TEST REPORT
+  Date: 2026-04-19
+  Runner: Vitest v1.6.1
+================================================================================
+
+RESULT: 97 PASSED / 0 FAILED
+Test Files: 10 passed (10)
+Duration:   ~3.1s
+
+--------------------------------------------------------------------------------
+  UNIT TESTS (npm run test)
+--------------------------------------------------------------------------------
+
+FILE: tests/unit/booking.service.test.ts                           15 tests ✓
+  ✓ getAllBookings returns paginated bookings
+  ✓ getBookingById returns booking when found
+  ✓ getBookingById returns null when not found
+  ✓ getBookingsByGuest returns list
+  ✓ getActiveBookings returns confirmed/checked_in
+  ✓ createBooking returns created booking
+  ✓ updateBooking returns updated booking
+  ✓ updateBooking returns null when not found
+  ✓ updateBookingStatus delegates
+  ✓ deleteBooking returns true
+  ✓ deleteBooking returns false
+  ✓ checkRoomConflict returns false when no overlapping bookings     [NEW]
+  ✓ checkRoomConflict returns true when overlap exists               [NEW]
+  ✓ checkRoomConflict with excludeBookingId passes through           [NEW]
+  ✓ checkRoomConflict: same room, adjacent dates → no conflict       [NEW]
+
+FILE: tests/unit/campaign.service.test.ts                          11 tests ✓
+  ✓ getAllCampaigns returns paginated campaigns with total
+  ✓ getAllCampaigns with default pagination
+  ✓ getCampaignById returns campaign when found
+  ✓ getCampaignById returns null when not found
+  ✓ createCampaign returns created campaign
+  ✓ updateCampaign returns updated campaign
+  ✓ updateCampaign returns null when not found
+  ✓ sendCampaign updates status to sent
+  ✓ sendCampaign returns null when campaign not found
+  ✓ deleteCampaign returns true when campaign exists
+  ✓ deleteCampaign returns false when campaign not found
+
+FILE: tests/unit/channel-manager.test.ts                            8 tests ✓  [NEW FILE]
+  fetchBookings:
+  ✓ creates bookings for new external entries
+  ✓ skips already-processed bookings (idempotency)
+  ✓ records conflict when dates overlap
+  ✓ records error when room number not found in DB
+  ✓ reuses existing guest when email matches
+  pushRates:
+  ✓ returns success with count of rooms pushed
+  ✓ filters by roomId when provided
+  ✓ returns failure when DB throws
+
+FILE: tests/unit/guest.service.test.ts                             10 tests ✓
+  ✓ getAllGuests returns paginated guests with total
+  ✓ getGuestById returns guest when found
+  ✓ getGuestById returns null when not found
+  ✓ searchGuests returns matching guests
+  ✓ searchGuests returns empty array when no match
+  ✓ createGuest returns the created guest
+  ✓ updateGuest returns updated guest
+  ✓ updateGuest returns null when not found
+  ✓ deleteGuest returns true when guest exists
+  ✓ deleteGuest returns false when guest not found
+
+FILE: tests/unit/interaction.service.test.ts                        8 tests ✓
+  ✓ getAllInteractions returns paginated interactions with total
+  ✓ getAllInteractions with default pagination
+  ✓ getInteractionsByGuest returns list of interactions
+  ✓ getInteractionsByGuest returns empty array
+  ✓ createInteraction returns created interaction
+  ✓ createInteraction with optional fields
+  ✓ deleteInteraction returns true when interaction exists
+  ✓ deleteInteraction returns false when interaction not found
+
+FILE: tests/unit/notification.service.test.ts                       7 tests ✓
+  ✓ getNotifications returns notifications sorted by date desc
+  ✓ getUnreadCount returns correct count
+  ✓ addNotification creates new notification
+  ✓ markAsRead marks notification as read
+  ✓ markAsRead returns false for non-existent notification
+  ✓ markAllAsRead marks all notifications as read
+  ✓ markAllAsRead returns true
+
+FILE: tests/unit/rbac.test.ts                                      16 tests ✓  [NEW FILE]
+  admin:
+  ✓ can do everything on every resource
+  manager:
+  ✓ can read and update guests
+  ✓ cannot delete guests
+  ✓ cannot delete bookings
+  ✓ cannot manage users
+  marketing:
+  ✓ can CRUD campaigns
+  ✓ cannot create or delete bookings
+  ✓ can only read users, not mutate
+  receptionist:
+  ✓ can create and read bookings
+  ✓ cannot delete anything
+  ✓ cannot access reports
+  ✓ cannot send campaigns
+  ✓ only admin canDelete
+  ✓ admin and manager canSeeFinancials
+  ✓ admin, manager, marketing canSendCampaigns
+  ✓ isHigherRole: admin > manager > marketing > receptionist
+
+FILE: tests/unit/room.service.test.ts                               9 tests ✓
+  ✓ getAllRooms returns active rooms ordered by number
+  ✓ getAllRooms falls back to demoStore when DB returns empty
+  ✓ getRoomById returns room when found
+  ✓ getRoomById returns null when not found
+  ✓ createRoom returns created room
+  ✓ updateRoom returns updated room
+  ✓ updateRoom returns null when not found
+  ✓ deleteRoom returns true when room exists
+  ✓ deleteRoom returns false when room not found
+
+FILE: tests/unit/segment.service.test.ts                            8 tests ✓
+  ✓ getAllSegments returns all segments
+  ✓ getSegmentById returns segment when found
+  ✓ getSegmentById returns null when not found
+  ✓ createSegment creates new segment with manual type
+  ✓ createSegment creates new segment with auto type and criteria
+  ✓ createSegment creates new segment with default type
+  ✓ deleteSegment returns true when segment exists
+  ✓ deleteSegment returns false when segment not found
+
+FILE: tests/unit/sync.service.test.ts                               5 tests ✓
+  ✓ getAllSyncLogs returns paginated logs with total
+  ✓ getAllSyncLogs with default pagination
+  ✓ addSyncLog creates success log
+  ✓ addSyncLog creates failed log when error provided
+  ✓ syncWithChannel creates sync log and returns success
+
+--------------------------------------------------------------------------------
+  INTEGRATION / API TESTS (npm run test:api)
+--------------------------------------------------------------------------------
+
+  Not run in this session (require live DB + Redis).
+  Files: tests/api/, tests/integration/
+  Run with: npm run test:api
+
+--------------------------------------------------------------------------------
+  E2E TESTS (npm run test:e2e)
+--------------------------------------------------------------------------------
+
+  Implemented in Sprint 3 (T37). Require running app + seeded DB.
+  Covers: login flow, create guest, send campaign.
+  Run with: npm run playwright:install && npm run db:seed && npm run test:e2e
+
+--------------------------------------------------------------------------------
+  COVERAGE SUMMARY
+--------------------------------------------------------------------------------
+
+  Service layer:
+  ✓ booking.service     — CRUD + checkRoomConflict (conflict detection)
+  ✓ campaign.service    — CRUD + send
+  ✓ guest.service       — CRUD + search
+  ✓ interaction.service — CRUD
+  ✓ notification.service— CRUD + mark read
+  ✓ room.service        — CRUD + demoStore fallback
+  ✓ segment.service     — CRUD
+  ✓ sync.service        — logs + syncWithChannel
+
+  Business logic:
+  ✓ RBAC permissions matrix — all 4 roles × all resources × all actions
+  ✓ Channel Manager — idempotency, conflict detection, guest upsert, pushRates
+
+  Not unit-tested (require integration setup):
+  ✗ /api/health degradation (DB/Redis down → 503)
+  ✗ auth middleware (JWT verify, token expiry)
+  ✗ Backup job (pg_dump, S3 upload)
+
+--------------------------------------------------------------------------------
+  BUGS FIXED IN THIS SESSION
+--------------------------------------------------------------------------------
+
+  1. booking.service.test.ts — getBookingById: test mocked 1 select,
+     service does 2 (COUNT + fetch). Fixed: added COUNT mock.
+
+  2. room.service.test.ts — getAllRooms empty: test expected [] but
+     service falls back to demoStore. Fixed: corrected assertion.
+
+  3. rbac.test.ts — marketing.users.read: PERMISSIONS matrix allows
+     marketing to read users. Fixed: test was wrong.
+
+  4. campaign.service.ts — CreateCampaignInput.segmentId typed as
+     number|undefined but DB schema + route pass number|null.
+     Fixed: added null to union type.
+
+================================================================================

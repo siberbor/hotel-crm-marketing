@@ -3,12 +3,14 @@
 import { startEmailWorker } from "./email.worker";
 import { startSyncWorker } from "./sync.worker";
 import { startScheduledJobs } from "@/jobs/scheduled-sync";
+import { startBackupJob } from "@/jobs/backup";
 
 console.log("[Workers] Starting...");
 
 const emailWorker = startEmailWorker();
 const syncWorker = startSyncWorker();
 startScheduledJobs();
+startBackupJob();
 
 console.log("[Workers] All workers running");
 
