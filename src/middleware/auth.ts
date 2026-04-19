@@ -84,6 +84,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next({ request: { headers } });
   }
 
+  // Guest API — нужен scope=guest
+  if (pathname.startsWith("/api/guest/")) {
+    const token = request.cookies.get("guest_token")?.value;
+    if (!token) return unauthorized();
+
+    const payload = await verifyToken(token);
+    if (!payload || payload.scope !== "guest") return unauthorized("Сессия истекла");
+
+    const headers = new Headers(request.headers);
+    headers.set("x-guest", JSON.stringify(payload));
+    return NextResponse.next({ request: { headers } });
+  }
+
   // CRM API — нужен staff токен
   if (pathname.startsWith("/api/") && !pathname.includes("/auth/")) {
     const token = request.cookies.get("token")?.value;
