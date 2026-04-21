@@ -222,3 +222,55 @@ Format: ## Session [DATE TIME] → Done / Blocked / Decisions / Next
 - next-pwa отключён в dev (disable: NODE_ENV === 'development') — избегаем SW кеш в разработке
 
 **Next:** Все спринты завершены. Готово к деплою.
+
+## Session 2026-04-19 — Sprint 5 ревизия + lint fix
+
+**Done:**
+- Полная ревизия Sprint 5 — все файлы уже реализованы в предыдущей сессии:
+  - Блок 1 (S01-S04): schema.ts (+tasks/shifts/guestAccounts), jwt.ts (+scope/guestId), middleware/auth.ts (staff/* + guest/* guards), tokens-green.css
+  - Блок 2 (W01-W06): src/app/page.tsx — витрина отеля, зелёный стиль, каталог номеров из БД
+  - Блок 3 (G01-G05): /api/auth/guest (POST+DELETE), (guest)/guest/login, bookings, services + GuestServiceForm
+  - Блок 4 (SF01-SF10): /api/tasks (GET/POST/PATCH/DELETE), /api/shifts (GET/POST/PATCH), StaffShell, /staff/login, rooms, tasks+StaffTasksClient, employees, checkin+StaffCheckinForm, checkin/[guestId], /api/guest/services
+- Исправлена ошибка ESLint: неиспользуемая переменная `modal` в tests/e2e/guests.spec.ts
+- Lint: 0 errors, 42 warnings (все warnings — console.log в серверных файлах, pre-existing)
+- TypeScript: 0 ошибок в Sprint 5 коде (3 ошибки в tests/unit/channel-manager.test.ts — pre-existing)
+
+**Blocked:** None
+
+**Decisions:**
+- Взаимодействие гостя (services) пишется в таблицу interactions с type="request" — varchar(50), нет DB constraint, допустимо
+- `/api/guest/services` делает двойную проверку auth (middleware + роут) — избыточно но безопасно
+- Маршрут `/staff/checkin` принимает `?roomId=N` для предселекции комнаты из страницы Номера
+
+**Next:** Sprint 5 полностью готов. Можно запускать `npm run db:push` (после подтверждения) и `npm run db:seed`, затем тестировать на dev сервере.
+
+## Session 2026-04-19 (продолжение) — Seed fix + dev запуск
+
+**Done:**
+- Исправлена ошибка в seed: не загружался .env → добавлен `config()` из dotenv
+- Seed прошёл успешно: 4 users, 5 rooms, 10 guests, 5 tasks, 2 guest accounts
+- Dev сервер запущен: http://localhost:3000 (✓ Ready in 12.5s)
+
+**Blocked:** None
+
+**Decisions:**
+- `src/db/seeds/index.ts` теперь вызывает `dotenv.config()` для загрузки DATABASE_URL из .env
+
+**Next:** Тестирование всех маршрутов:
+- `/` — витрина отеля
+- `/guest/login` → `/guest/bookings` (ivan@test.com / guest123)
+- `/staff/login` → `/staff/rooms` (reception@hotel.com / reception123)
+
+
+## Session 2026-04-19
+**Done:**
+- Исправлен баг "выкидывает с личного кабинета": авторизованный гость попадал на /guest/login вместо /guest/bookings
+- /guest/login/page.tsx → server component wrapper: проверяет guest_token cookie, redirect на /guest/bookings если уже авторизован. Форма вынесена в GuestLoginForm.tsx (client component)
+- /guest/register/page.tsx → аналогично: server wrapper + GuestRegisterForm.tsx
+- page.tsx (витрина): добавлена проверка guest_token cookie, все ссылки /guest/login заменены на guestDest (→ /guest/bookings если авторизован). Кнопка "Забронировать" → "Забронировать" (авторизован) / "Войти и забронировать" (нет)
+
+**Blocked:** нет
+
+**Decisions:** Server component wrappers для auth-redirect на login/register страницах — паттерн применён последовательно
+
+**Next:** Проверить полный flow: регистрация → /guest/bookings → создание бронирования → возврат на витрину → кнопка ведёт в /guest/bookings

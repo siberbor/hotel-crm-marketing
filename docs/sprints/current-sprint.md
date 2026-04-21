@@ -1,7 +1,8 @@
 # Current Sprint: Sprint 5 — Staff Portal & Guest Personal Account
 
-**Status:** 🔲 TODO
-**Started:** TBD
+**Status:** ✅ DONE
+**Started:** 2026-04-19
+**Completed:** 2026-04-19
 **Design reference:** `landing/*.png`
 
 ## Контекст
